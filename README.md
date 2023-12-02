@@ -141,29 +141,7 @@ class agent:
                     delta_omega = omega_target-(next_omega[0]/358.0)
                     state = (delta_omega, omega_target)
                 elif k == 59:
-                    omega_target = 100.0 / 358.0
-                    delta_omega = omega_target-(next_omega[0]/358.0)
-                    state = (delta_omega, omega_target)
-                elif k == 89:
-                    omega_target = 150.0 / 358.0
-                    delta_omega = omega_target-(next_omega[0]/358.0)
-                    state = (delta_omega, omega_target)
-                elif k == 119:
-                    omega_target = 200.0 / 358.0
-                    delta_omega = omega_target-(next_omega[0]/358.0)
-                    state = (delta_omega, omega_target)
-                elif k == 149:
-                    omega_target = 250.0 / 358.0
-                    delta_omega = omega_target-(next_omega[0]/358.0)
-                    state = (delta_omega, omega_target)
-                elif k == 179:
-                    omega_target = 300.0 / 358.0
-                    delta_omega = omega_target-(next_omega[0]/358.0)
-                    state = (delta_omega, omega_target)
-                elif k == 209:
-                    omega_target = 358.0 / 358.0
-                    delta_omega = omega_target-(next_omega[0]/358.0)
-                    state = (delta_omega, omega_target)
+                    ...
 
                 #reversed normalisation for DC Motor
                 action = self.actor.get_action(state) * 50.0
