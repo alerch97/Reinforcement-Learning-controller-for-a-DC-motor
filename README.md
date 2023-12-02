@@ -87,6 +87,149 @@ class agent:...
 
 agent().train()
 ```
+## Agent
+By calling the agent class, the actor critic and DC-motor get initialised. The dimensions of the state and action vectors are set. The action bound is fixed to 50 volts. For the random selection of an action the standard deviation is also bounded. The train function starts with initialising empty lists. For the start of an episode the motor start with an angular velocity of $\omega=0$. With the if else query during an episode, a continouse change of the target angular velocity is performed (can be better realised maybe with methods of Desing of Experiments (DoE)). Based on the current state, the recommended action of the actor is calculated and gets fed to the motor for determining the next state. With the new reward the values of TD-target and the advantage function are calculated. If $k$ reaches the maximum step count of 240, an update of the actor's and critic's neural networks is performed. After finishing the training process, different plots are displayed (losses and reward).
+```python
+class agent:
+    def __init__(self):
+        self.state_dim = 2
+        self.action_dim = 1
+        self.action_bound = 50.0
+        self.std_bound = [1e-5, 1.0]
+
+        self.actor = actor(self.state_dim, self.action_dim, self.action_bound, self.std_bound)
+        self.critic = critic(self.state_dim)
+        self.dcmotor = dcmotor()
+
+    def td_target(self, reward, next_state, k):
+        if k==(sample_steps-1):
+            return reward
+        v_value = self.critic.model.predict(np.reshape(next_state, [1, self.state_dim]))
+        return np.reshape(reward + gamma * v_value[0], [1, 1])
+
+    def advantage(self, td_target, baseline):
+        return td_target - baseline
+
+    def list_to_batch(self, list):
+        batch = list[0]
+        for elem in list[1:]:
+            batch = np.append(batch, elem, axis=0)
+        return batch
+
+    def train(self):
+        ep_batch = []
+        ep_reward_batch = []
+        actor_loss_batch = []
+        critic_loss_batch = []
+        for ep in range(max_episodes):
+            state_batch = []
+            action_batch = []
+            td_target_batch = []
+            advantage_batch = []
+            ep_batch.append(ep)
+            episode_reward = 0
+            next_omega = 0.0     #initial state for every new episode
+
+            for k in range(sample_steps):
+                #change between target values in one episode
+                if k == 0:
+                    omega_target = 10.0 / 358.0
+                    delta_omega = omega_target-next_omega/358.0
+                    state = (delta_omega, omega_target)
+                elif k == 29:
+                    omega_target = 50.0 / 358.0
+                    delta_omega = omega_target-(next_omega[0]/358.0)
+                    state = (delta_omega, omega_target)
+                elif k == 59:
+                    omega_target = 100.0 / 358.0
+                    delta_omega = omega_target-(next_omega[0]/358.0)
+                    state = (delta_omega, omega_target)
+                elif k == 89:
+                    omega_target = 150.0 / 358.0
+                    delta_omega = omega_target-(next_omega[0]/358.0)
+                    state = (delta_omega, omega_target)
+                elif k == 119:
+                    omega_target = 200.0 / 358.0
+                    delta_omega = omega_target-(next_omega[0]/358.0)
+                    state = (delta_omega, omega_target)
+                elif k == 149:
+                    omega_target = 250.0 / 358.0
+                    delta_omega = omega_target-(next_omega[0]/358.0)
+                    state = (delta_omega, omega_target)
+                elif k == 179:
+                    omega_target = 300.0 / 358.0
+                    delta_omega = omega_target-(next_omega[0]/358.0)
+                    state = (delta_omega, omega_target)
+                elif k == 209:
+                    omega_target = 358.0 / 358.0
+                    delta_omega = omega_target-(next_omega[0]/358.0)
+                    state = (delta_omega, omega_target)
+
+                #reversed normalisation for DC Motor
+                action = self.actor.get_action(state) * 50.0
+                print(action)
+                action = np.clip(action, -self.action_bound, self.action_bound)
+                omega = (omega_target-state[0]) * 358.0
+                next_omega = self.dcmotor.next_state(omega, action)
+
+                #normalisation for RL-Agent and reward calculation
+                delta_omega_next = omega_target - (next_omega / 358.0)
+                reward = c * (abs(delta_omega_next))
+                action = action/50.0
+                omega_target = np.clip(omega_target, 0.0, 1.0)
+                next_state = (delta_omega_next[0], omega_target)
+
+                state = np.reshape(state, [1, self.state_dim])
+                action = np.reshape(action, [1, self.action_dim])
+                next_state = np.reshape(next_state, [1, self.state_dim])
+                reward = np.reshape(reward, [1, 1])
+
+                td_target = self.td_target(reward, next_state, k)
+                advantage = self.advantage(td_target, self.critic.model.predict(state))
+
+                state_batch.append(state)
+                action_batch.append(action)
+                td_target_batch.append(td_target)
+                advantage_batch.append(advantage)
+
+                if len(state_batch) >= sample_steps:
+                    states = self.list_to_batch(state_batch)
+                    actions = self.list_to_batch(action_batch)
+                    td_targets = self.list_to_batch(td_target_batch)
+                    advantages = self.list_to_batch(advantage_batch)
+
+                    actor_loss = self.actor.train(states, actions, advantages)
+                    critic_loss = self.critic.train(states, td_targets)
+
+                episode_reward += reward[0][0]
+                state = next_state[0]
+
+
+            actor_loss_proto = tf.make_tensor_proto(actor_loss)
+            critic_loss_proto = tf.make_tensor_proto(critic_loss)
+            actor_loss_array = tf.make_ndarray(actor_loss_proto)
+            critic_loss_array = tf.make_ndarray(critic_loss_proto)
+            actor_loss_batch.append(actor_loss_array)
+            critic_loss_batch.append(critic_loss_array)
+            ep_reward_batch.append(episode_reward)
+            print('EP{} EpisodeReward={} ActorLoss={} CriticLoss={}'.format(ep, episode_reward, actor_loss_array, critic_loss_array))
+
+        # plot episode reward and losses over episodes
+        fig, (ax1, ax2, ax3) = plt.subplots(3, 1)
+        ax1.plot(ep_batch, ep_reward_batch)
+        ax1.set_xlabel('Episode')
+        ax1.set_ylabel('Episode reward')
+        ax2.plot(ep_batch, actor_loss_batch)
+        ax2.set_xlabel('Episode')
+        ax2.set_ylabel('Actor loss')
+        ax3.plot(ep_batch, critic_loss_batch)
+        ax3.set_xlabel('Episode')
+        ax3.set_ylabel('Critic loss')
+        fig.suptitle('TotEpisodes={}, Gamma={}, SampleSteps={}, ActorLR={}, CriticLR={}'.format(ep, gamma, sample_steps, actor_lr, critic_lr))
+        plt.show()
+
+        self.actor.model.save_weights('weights/actor_weights.h5')
+```
 
 
 
