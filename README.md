@@ -213,7 +213,7 @@ class agent:
 ```
 
 ## Actor
-In the beginning, the actor's neural network with two hidden layers (each with 100 neurons) is initialised. The output of the actor is a gaussian distribution with a mean $\mu$ and a standard deviation $\sigma$. Initially, $\sigma$ is quite big, which leads to actions being further away from the mean to guarantee an exploration of the whole action range. By performing a prediction for the current state, we get next action (voltage) for the motor. To perform the training via gradient descent, we have to define a compatabile loss function based on the gaussian output. Due to the characteristics of the A2C-algorithm, the loss consists of the logarithmic probability density function times the value of the advantage function (provided by the critic).
+In the beginning, the actor's neural network with two hidden layers (each with 100 neurons) is initialised. The output of the actor is a gaussian distribution with a mean $\mu$ and a standard deviation $\sigma$. Initially, $\sigma$ is quite big, which leads to actions being further away from the mean to guarantee an exploration of the whole action range. The softplus activation function guarantees the range $[0,1]$ for $\sigma$. The selection of the tanh activation function for $\mu$ is examined later. By performing a prediction for the current state, we get next action (voltage) for the motor. To perform the training via gradient descent, we have to define a compatabile loss function based on the gaussian output. Due to the characteristics of the A2C-algorithm, the loss consists of the logarithmic probability density function times the value of the advantage function (provided by the critic).
 
 ```python
 def __init__(self, state_dim, action_dim, action_bound, std_bound):
@@ -261,7 +261,7 @@ def __init__(self, state_dim, action_dim, action_bound, std_bound):
 ```
 
 ## Critic
-In the beginning, the actor's neural network with two hidden layers (each with 100 neurons) is initialised. The output of the actor is a gaussian distribution with a mean $\mu$ and a standard deviation $\sigma$. Initially, $\sigma$ is quite big, which leads to actions being further away from the mean to guarantee an exploration of the whole action range. By performing a prediction for the current state, we get next action (voltage) for the motor. To perform the training via gradient descent, we have to define a compatabile loss function based on the gaussian output. Due to the characteristics of the A2C-algorithm, the loss consists of the logarithmic probability density function times the value of the advantage function (provided by the critic).
+In the beginning, the critic's neural network with two hidden layers (each with 100 neurons) is initialised. The output of the critic is a linear activation function because the value can be whatever negative or positive. The loss function is the mean squared error between the by the critic's neural network predicted value function and the TD-target. Here the neural networks gets updated regarding the best guess (TD-target).
 
 ```python
 class critic:
@@ -291,6 +291,8 @@ class critic:
         self.opt.apply_gradients(zip(grads, self.model.trainable_variables))
         return loss
 ```
+
+## Choosing the right hyperparameters and network topologies
 
 
 
