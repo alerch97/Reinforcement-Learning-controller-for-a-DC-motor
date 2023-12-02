@@ -4,6 +4,9 @@ Topic of my bachelor thesis from 2020
 ## Aim
 This is an approach of a control design for a DC-motor with the help of Reinforcement Learning. The controller (RL-agent) consists of an artificial neural network, which is trained by the A2C-algorithm (Advantage Actor Critic). The environment is characterized by a simple discrete LTI-system (linear time invariant) of the motor. The aim is that the RL-agent is able to pass the right voltage to the motor to reach the desired angular velocity. Regarding the stationary as well as the dynamic behaviour a brief analysis is performed.
 
+## A2C-algorithm
+tbd.
+
 ## Environment
 I decided to create a state-space representation of the DC-motor. There is the possibility to implement this kind auf physical model with SciPy. The following figure represents the simplified physical equivalent circuit diagram.
 
@@ -209,9 +212,85 @@ class agent:
         self.actor.model.save_weights('weights/actor_weights.h5')
 ```
 
+## Actor
+In the beginning, the actor's neural network with two hidden layers (each with 100 neurons) is initialised. The output of the actor is a gaussian distribution with a mean $\mu$ and a standard deviation $\sigma$. Initially, $\sigma$ is quite big, which leads to actions being further away from the mean to guarantee an exploration of the whole action range. By performing a prediction for the current state, we get next action (voltage) for the motor. To perform the training via gradient descent, we have to define a compatabile loss function based on the gaussian output. Due to the characteristics of the A2C-algorithm, the loss consists of the logarithmic probability density function times the value of the advantage function (provided by the critic).
 
+```python
+def __init__(self, state_dim, action_dim, action_bound, std_bound):
+        self.state_dim = state_dim
+        self.action_dim = action_dim
+        self.action_bound = action_bound
+        self.std_bound = std_bound
+        self.model = self.create_model()
+        self.opt = tf.keras.optimizers.Adam(actor_lr)
 
+    def create_model(self):
+        state_input = Input((self.state_dim,))
+        dense_1 = Dense(100, activation='relu')(state_input)
+        dense_2 = Dense(100, activation='relu')(dense_1)
+        out_mu = Dense(self.action_dim, activation='tanh')(dense_2)
+        std_output = Dense(self.action_dim, activation='softplus')(dense_2)
+        mu_output = Lambda(lambda x: x * 1.0)(out_mu)
+        return tf.keras.models.Model(state_input, [mu_output, std_output])
 
+    def get_action(self, state):
+        state = np.reshape(state, [1, self.state_dim])
+        mu, std = self.model.predict(state)
+        mu, std = mu[0], std[0]
+        return (np.random.normal(mu, std, size=self.action_dim))
+
+    def log_pdf(self, mu, std, actions):
+        std = tf.clip_by_value(std, self.std_bound[0], self.std_bound[1])
+        var = std ** 2
+        log_policy_pdf = -0.5 * (actions - mu) ** 2 / \
+                         var - 0.5 * tf.math.log(var * 2 * np.pi)
+        return tf.reduce_sum(log_policy_pdf, 1, keepdims=True)
+
+    def compute_loss(self, mu, std, actions, advantages):
+        log_policy_pdf = self.log_pdf(mu, std, actions)
+        loss_policy = log_policy_pdf * advantages
+        return tf.reduce_mean(-loss_policy)
+
+    def train(self, states, actions, advantages):
+        with tf.GradientTape() as tape:
+            mu, std = self.model(states, training=True)
+            loss = self.compute_loss(mu, std, actions, advantages)
+        grads = tape.gradient(loss, self.model.trainable_variables)
+        self.opt.apply_gradients(zip(grads, self.model.trainable_variables))
+        return loss
+```
+
+## Critic
+In the beginning, the actor's neural network with two hidden layers (each with 100 neurons) is initialised. The output of the actor is a gaussian distribution with a mean $\mu$ and a standard deviation $\sigma$. Initially, $\sigma$ is quite big, which leads to actions being further away from the mean to guarantee an exploration of the whole action range. By performing a prediction for the current state, we get next action (voltage) for the motor. To perform the training via gradient descent, we have to define a compatabile loss function based on the gaussian output. Due to the characteristics of the A2C-algorithm, the loss consists of the logarithmic probability density function times the value of the advantage function (provided by the critic).
+
+```python
+class critic:
+    def __init__(self, state_dim):
+        self.state_dim = state_dim
+        self.model = self.create_model()
+        self.opt = tf.keras.optimizers.Adam(critic_lr)
+
+    def create_model(self):
+        return tf.keras.Sequential([
+            Input((self.state_dim,)),
+            Dense(100, activation='relu'),
+            Dense(100, activation='relu'),
+            Dense(1, activation='linear')
+        ])
+
+    def compute_loss(self, v_pred, td_targets):
+        mse = tf.keras.losses.MeanSquaredError()
+        return mse(td_targets, v_pred)                  #MSE of advantage function
+
+    def train(self, states, td_targets):
+        with tf.GradientTape() as tape:
+            v_pred = self.model(states, training=True)
+            assert v_pred.shape == td_targets.shape
+            loss = self.compute_loss(v_pred, tf.stop_gradient(td_targets))
+        grads = tape.gradient(loss, self.model.trainable_variables)
+        self.opt.apply_gradients(zip(grads, self.model.trainable_variables))
+        return loss
+```
 
 
 
