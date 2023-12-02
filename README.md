@@ -44,13 +44,19 @@ In the following figure you can see the overall implementation idea as well as t
 
 The interfaces of the DC-motor are the voltage $u$ as an input and the current angular velocity omega as an output. In this context, the voltage $u$ represents the RL-agent's action. Following this action, the DC-motor responds in the next discrete time step with the current angular velocity at time step $t+1$, which is then fed back to the RL-agent. This feedback loop informs the RL-agent about the consequences of its previous action. To enhance the RL-agent's ability to achieve desired outcomes, not only the current angular velocity $omega_t$ is provided, but also of course the target angular velocity $omega_{target}$. This allows the RL-agent to work towards reaching the specified target value in subsequent steps. However, for the agent, the control difference $delta_{omega}$ is derived from these two values and fed back to the system. Therefore the State vector $S_t$ consists of $delta_{omega}$ and $omega_{target}$. In addition, the elements of the state vector are scaled when they enter the RL-agent so that they are in the range $[-1, 1]$ (Min-Max-scaling). Negative control differences and negative voltages can also be represented. Of course this scaling must be reversed for the action when leaving the RL-agent. The scaling task is a part of the RL-agent.<br>
 Furthermore, to train the RL-agent using the A2C-algorithm, a reward function must be defined. The function follows specific criteria:
- Markup : - maximal reward when the control difference is $0 s^{−1}$,
-          - a maximum reward value of $0$,
-          - negative values for non-zero control differences and
-          - increasingly negative rewards for higher control differences.
+- maximal reward when the control difference is $0 s^{−1}$,
+- a maximum reward value of $0$,
+- negative values for non-zero control differences and
+- increasingly negative rewards for higher control differences.
           
 A linear equation with a negative factor c and the absolute value of the control difference meet these requirements. The factor c determines the penalty strength for deviation from the desired angular velocity, also assigned as a hyperparameter for training success:
-$$R_t \left(\delta\omega_t\right) = c\cdot \abs(\delta\omega_t)$$.
+$$R_t \left(\Delta\omega_t\right) = c\cdot |\Delta\omega_t|.$$
+
+Before heading to the code implementations, we will have a look on the flow chart of the RL-agent's training process. After initialising the DC-motor-model as well as the actor and critic neural networks along with hyperparameters, the training starts with episode 0. At step $k = 0$, an initial state is set and an action is chosen. This leads to a new state $S_{k+1}$ and a reward $R_{k+1}$. Subsequently, the TD-target and advantage function value are computed and stored. The step count $k$ is incremented. If the maximum step count per episode is not reached, both the current state $S_k$ and the cumulative reward $R$ are updated. The program then returns to its flow and starts again with the fourth process. If the condition $k = k_{max}$ is met, the two neural networks are updated. If the maximum episode count is not reached, the current episode count is incremented and the process restarts with the initialisation of the starting state, k=0 and R=0. If this condition is affirmed, training data and actor neural network are saved, marking the end of the training (sorry, the flow chart is still in German).
+
+![Programmablaufplan](https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/f71d5531-a4a0-49c7-8061-57ab423fd13e)
+
+
 
 
 
