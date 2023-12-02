@@ -306,6 +306,11 @@ The two hypothetical acitvation functions (linear and TanH) for the output neuro
 
 ![image](https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/0f09bd52-d0c3-447a-bc27-c6ae6b02a309)
 
+### Expansion of the action range
+
+### Reducing factor $\gamma$
+
+## Training
 
 
 
