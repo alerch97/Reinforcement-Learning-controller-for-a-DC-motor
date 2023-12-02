@@ -301,6 +301,11 @@ class critic:
 
 ## Choosing the right hyperparameters and network topologies
 
+### Activation function for the actor's $\mu$
+The two hypothetical acitvation functions (linear and TanH) for the output neuron $\mu$ of the actor get checked via a first training for 500 episodes. In the following figure you can see a significant difference. The actor loss and the cumulative reward start to decrease with passing 350 episodes and 400 episodes respectively. The TanH activation function seems to work here.
+
+![image](https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/0f09bd52-d0c3-447a-bc27-c6ae6b02a309)
+
 
 
 
