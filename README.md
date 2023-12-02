@@ -5,7 +5,14 @@ Topic of my bachelor thesis from 2020
 This is an approach of a control design for a DC-motor with the help of Reinforcement Learning. The controller (RL-agent) consists of an artificial neural network, which is trained by the A2C-algorithm (Advantage Actor Critic). The environment is characterized by a simple discrete LTI-system (linear time invariant) of the motor. The aim is that the RL-agent is able to pass the right voltage to the motor to reach the desired angular velocity. Regarding the stationary as well as the dynamic behaviour a brief analysis is performed.
 
 ## A2C-algorithm
-tbd.
+The Advantage-Actor-Critic-algorithm combines the advantages of Temporal Difference Learning (TD-Learning) and the Policy Gradient method. Here the actor learns the strategy using the Policy Gradient method and accordingly executes new actions during training. In contrast, the critic evaluates the current state through the value function forced by the actor's action. Similar to the actor, the critic learns the value function through TD-Learning. The goal, identical to TD-Learning, is to apply the Actor-critic method to continuous problems. For a continuouse action range it is a common idea to choose a gaussian probability density function for the actor's strategy $\pi$:
+$$\pi(a|s,\theta) = \dfrac{1}{\sigma(s,\theta)\sqrt(2\pi)} \exp(-\dfrac{(a-\mu(s,\theta))^2}{2\sigma(s,\theta)^2}).$$
+The advantage function $A_t$ is characterised by the adjustment with the baseline $v(S_t,w_t)$ to bound the variance for the weighting of gradients ($w$ are the weights of the critic's neural network):
+$$A_t = R_{t+1} + \gamma v(S_{t+1},w_t) - v(S_t,w_t).$$
+This function is necessary for updating the weights $\theta$ of the actor's neural network (with a specific learning rate $\alpha$):
+$$\theta_{t+1} = \theta_{t} + \alpha A_t \nabla_{\theta} [ln(\pi (A_t|S_t,\theta_t))].$$
+For updating the weights of the critic, we have to implement the following equation (with a specific learning rate $\alpha$):
+$$w_{t+1} = w_{t} + \alpha A_t \nabla_{w} [v (S_t,w_t)].$$
 
 ## Environment
 I decided to create a state-space representation of the DC-motor. There is the possibility to implement this kind auf physical model with SciPy. The following figure represents the simplified physical equivalent circuit diagram.
