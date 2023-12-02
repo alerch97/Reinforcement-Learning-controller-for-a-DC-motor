@@ -38,7 +38,7 @@ class dcmotor:
 By calling this class, the DC-motor gets initialised as a DLTI-system.
 
 ## Realisation Idea
-In the following figure you can see the overall implementation idea as well as the control structure and interfaces between the different needed parts:
+In the following figure you can see the overall implementation idea as well as the control structure and interfaces between the different needed parts. It is important to note that after successful training, the RL-agent only consists of the actor (inclusively pre- post-processing tasks).
 
 ![Kontrollstruktur_englisch](https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/3491898d-25fb-44f8-9c09-809fc90dd47b)
 
@@ -52,11 +52,41 @@ Furthermore, to train the RL-agent using the A2C-algorithm, a reward function mu
 A linear equation with a negative factor c and the absolute value of the control difference meet these requirements. The factor c determines the penalty strength for deviation from the desired angular velocity, also assigned as a hyperparameter for training success:
 $$R_t \left(\Delta\omega_t\right) = c\cdot |\Delta\omega_t|.$$
 
-Before heading to the code implementations, we will have a look on the flow chart of the RL-agent's training process. After initialising the DC-motor-model as well as the actor and critic neural networks along with hyperparameters, the training starts with episode 0. At step $k = 0$, an initial state is set and an action is chosen. This leads to a new state $S_{k+1}$ and a reward $R_{k+1}$. Subsequently, the TD-target and advantage function value are computed and stored. The step count $k$ is incremented. If the maximum step count per episode is not reached, both the current state $S_k$ and the cumulative reward $R$ are updated. The program then returns to its flow and starts again with the fourth process. If the condition $k = k_{max}$ is met, the two neural networks are updated. If the maximum episode count is not reached, the current episode count is incremented and the process restarts with the initialisation of the starting state, k=0 and R=0. If this condition is affirmed, training data and actor neural network are saved, marking the end of the training (sorry, the flow chart is still in German).
+Before heading to the code implementations, we will have a look on the flow chart of the RL-agent's training process. After initialising the DC-motor-model as well as the actor and critic neural networks along with hyperparameters, the training starts with episode 0. At step $k = 0$, an initial state is set and an action is chosen. This leads to a new state $S_{k+1}$ and a reward $R_{k+1}$. Subsequently, the TD-target and advantage function value are computed and stored. The step count $k$ is incremented. If the maximum step count per episode is not reached, both the current state $S_k$ and the cumulative reward $R$ are updated. The program then returns to its flow and starts again with the fourth process. If the condition $k = k_{max}$ is met, the two neural networks are updated. If the maximum episode count is not reached, the current episode count is incremented and the process restarts with the initialisation of the starting state, $k=0$ and $R=0$. If this condition is affirmed, training data and actor neural network are saved, marking the end of the training (sorry, the flow chart is still in German).
 
 ![Programmablaufplan](https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/f71d5531-a4a0-49c7-8061-57ab423fd13e)
 
+For the higher-level code structur beside the class for the motor model, I specify further classes for the actor, critic and the agent. Moreover, the initialisation of different hyperparameters takes place in the beginning. Calling the function agent().train() the execution of the training process starts.
+```python
+# import libraries
+import tensorflow as tf
+from tensorflow.keras.layers import Input, Dense, Lambda
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import signal
 
+#float type default
+tf.keras.backend.set_floatx('float64')
+
+#hyperparameters
+gamma = 0.5            #discount factor
+actor_lr = 0.00006      #actor learning rate
+critic_lr = 0.0002      #critic learning rate
+sample_steps = 240     #steps per episode and batch size
+max_episodes = 2000    #number of episodes
+delta_T = 0.05          #for DLTI
+c = -0.95               #factor reward function
+
+class actor:...
+
+class critic:...
+
+class dcmotor:...
+
+class agent:...
+
+agent().train()
+```
 
 
 
