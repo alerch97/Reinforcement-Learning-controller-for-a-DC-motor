@@ -268,7 +268,7 @@ def __init__(self, state_dim, action_dim, action_bound, std_bound):
 ```
 
 ## Critic
-In the beginning, the critic's neural network with two hidden layers (each with 100 neurons) is initialised. The output of the critic is a linear activation function because the value can be whatever negative or positive. The loss function is the mean squared error between the by the critic's neural network predicted value function and the TD-target. Here the neural networks gets updated regarding the best guess (TD-target).
+In the beginning, the critic's neural network with two hidden layers (each with 100 neurons) is initialised. The output of the critic is a linear activation function because the value of the value function can be whatever negative or positive. The loss function is the mean squared error between the by the critic's neural network predicted value function and the TD-target. Here the neural networks gets updated regarding the best guess (TD-target).
 
 ```python
 class critic:
@@ -300,11 +300,18 @@ class critic:
 ```
 
 ## Choosing the right hyperparameters and network topologies
+The right choice of hyperparameters and the topologies of the neural networks (for the actor and thr critic) is more or less a trial-and-error-process. Nevertheless, we should think about instead of being in the dark. Important to mention: we cannot have a look at the validation loss like in supervised training because we don't know the truth! A successful RL-agent depends a lot on the specified reward function!
 
 ### Activation function for the actor's $\mu$
-The two hypothetical acitvation functions (linear and TanH) for the output neuron $\mu$ of the actor get checked via a first training for 500 episodes. In the following figure you can see a significant difference. The actor loss and the cumulative reward start to decrease with passing 350 episodes and 400 episodes respectively. The TanH activation function seems to work here.
+The two hypothetical acitvation functions (linear and TanH) for the output neuron $\mu$ of the actor get checked via a first training for 500 episodes. In the following figure you can see a significant difference. The actor loss and the cumulative reward start to decrease with passing 350 episodes and 400 episodes respectively. The TanH activation function seems to work here better.
 
 ![image](https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/0f09bd52-d0c3-447a-bc27-c6ae6b02a309)
+
+### Neurons and hidden layers
+In general, I would highly recommend an intensive investigation of different topologies for both networks as well as diffenrent combinations of both networks to check for each other's impact. Here I have run just a couple of short trainings. The charts below show that the use of 100 neurons strives for faster and clearer convergence. The neural networks with the fewest neurons show a very slow convergence in comparison. In addition, a greater spread of values can be recognised in their progressions. The use of 50 neurons shows a somewhat clearer tendency to converge, but requires more time (especially at the beginning of training). This tendency is visible after approx. 100 to 150 episodes. Similarly, a greater spread of the progresses can be recognised at the beginning. For this reason, the architecture with 100 neurons per hidden layer is chosen. There may be a risk that the RL-agent will not be able to generalise the strategy to other angular velocities (missing exploration and / or overfitting). This needs to be checked after training. If this is the case, the number of neurons needs to be adjusted.
+
+![image](https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/1a66a03d-fd29-4e8d-8c38-2e551c1c2ed4)
+
 
 ### Expansion of the action range
 
