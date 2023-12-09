@@ -365,7 +365,8 @@ In the following figure you can see the reward, critic and actor loss for each e
 
 <img width="372" alt="image" src="https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/a2581bce-ea80-4589-b901-d7e9e6d94121">
 
-Now we take a closer look on the output of the actor for different episodes and different target profiles. The first profile was changing between higher and lower angular velocities. For 260 steps and a time discretisation of 0.05 s the x-axis goes until 12 s. You can see the $\mu$ and the $\sigma$ of the policy based on the gaussian probability density function. 
+Now we take a closer look on the output of the actor for different episodes and different target profiles. The first profile was changing between higher and lower angular velocities. For 260 steps and a time discretisation of 0.05 s the x-axis goes until 12 s. You can see the $\mu$ and the $\sigma$ of the policy based on the gaussian probability density function. With regard to both curves, it can be clearly seen that the entire action range from [-1, 1] is explored and the entire range is also used for reaching the target angular velocities. It can also be seen that the $\mu$ curve (even for high episodes) is not constant in the stationary range of low angular velocities. The standard deviation at an angular velocity of $10 s^{-1}$ is around five times as high as the standard deviation at $358 s^{-1}$ (see episode 1,999).
+Constant curves and small standard deviations (as is the case with high angular velocities) would also be desirable here. One possible explanation is that the gradients in the updating process of the ANN are small in magnitude at low angular velocities. This means that smaller steps are taken towards an optimal strategy. Longer training (e.g. 2,500 episodes) could provide a remedy. It is then necessary to check whether constant expected values $\mu$ for small target angular velocities are also subsequently achieved and whether the standard deviation is close to zero at the end of training. However, there is also a risk of overfitting.
 
 <img width="365" alt="image" src="https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/3db327f7-32fd-4044-bcef-18d5523768c3">
 
@@ -376,7 +377,9 @@ Now we take a closer look on the output of the actor for different episodes and 
 <img width="361" alt="image" src="https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/71ea8819-dcb6-46c0-9636-9d51ab798c94">
 
 ## Further steps
+- Training with a completely randomised profile of target angular velocities every (change after a defined short period of time)
 - Behaviour of the RL-agent for disturbance (here load torque $M_I$)
+- Impact of the time discretisation size
 - Implementation of the RL-agent as a controller for a test bench
 - Comparison to conventional control design
 - Impact of sensor quality (sampling rate and accuracy) and actuator (PWM signal)
