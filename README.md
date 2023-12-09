@@ -365,5 +365,19 @@ In the following figure you can see the reward, critic and actor loss for each e
 
 <img width="372" alt="image" src="https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/a2581bce-ea80-4589-b901-d7e9e6d94121">
 
+Now we take a closer look on the output of the actor for different episodes and different target profiles. The first profile was changing between higher and lower angular velocities. For 260 steps and a time discretisation of 0.05 s the x-axis goes until 12 s. You can see the $\mu$ and the $\sigma$ of the policy based on the gaussian probability density function. 
 
+<img width="365" alt="image" src="https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/3db327f7-32fd-4044-bcef-18d5523768c3">
+
+<img width="366" alt="image" src="https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/1c434b32-7109-447e-b562-1a28033b1b5f">
+
+<img width="366" alt="image" src="https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/fcb41202-0f3d-406f-b09e-9447b2e696f4">
+
+<img width="361" alt="image" src="https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/71ea8819-dcb6-46c0-9636-9d51ab798c94">
+
+## Further steps
+- Behaviour of the RL-agent for disturbance (here load torque $M_I$)
+- Implementation of the RL-agent as a controller for a test bench
+- Comparison to conventional control design
+- Impact of sensor quality (sampling rate and accuracy) and actuator (PWM signal)
 
