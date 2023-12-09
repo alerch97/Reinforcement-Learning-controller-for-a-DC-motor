@@ -385,6 +385,9 @@ Constant curves and small standard deviations (as is the case with high angular 
 - Impact of sensor quality (sampling rate and accuracy) and actuator (PWM signal)
 
 ## License
+
+I would love to see the use of my code in other projects! Please just cite me! :)
+
 Copyright © 2023 Alexander Lerch
 
-A2C_DCmotor.py is licensed under the MIT License.
+A2C_DCMotor.py is licensed under the MIT License.
