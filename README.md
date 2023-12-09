@@ -327,8 +327,12 @@ With regard to the TanH activation function we have to think about the value ran
 
 ![image](https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/13a6deab-d886-42f2-b3b2-6e4953691e8a)
 
-
 ### Reducing factor $\gamma$
+The next step is to choose a right reducing factor $\gamma$. Instead of examining the steady-state control difference, cumulative reward values are computed for step responses corresponding to specific target angular velocities $\omega_{target} = [29 1/s, 173 1/s, 329 1/s, 358 1/s]$. The cumulative reward is an indicator of the RL-agent's performance, with lower values indicating poorer quality. The results are presented in the figure below, where the average cumulative reward values ($R_k$) for different reducing factors are shown. The average values provide insight into the RL-agent's performance across a wide range of angular velocities. Notably, the RL-agent with a reduction factor of 0.5 achieves the highest average reward, leading to the selection of this reduction factor.
+
+<img width="805" alt="image" src="https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/cf19af17-290c-4104-b80c-d3fc9d1119cd">
+
+
 
 ## Training
 
