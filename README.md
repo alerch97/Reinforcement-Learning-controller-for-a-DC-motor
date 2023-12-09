@@ -17,7 +17,7 @@ $$w_{t+1} = w_{t} + \alpha A_t \nabla_{w} [v (S_t,w_t)].$$
 ## Environment
 I decided to create a state-space representation of the DC-motor. There is the possibility to implement this kind auf physical model with SciPy. The following figure represents the simplified physical equivalent circuit diagram.
 
-![Ersatzschaltbild](https://github.com/alerch97/Reinforcement-Learning-for-a-DC-motor/assets/152506794/0f871774-6cd9-40da-991b-2744136e2e62)
+![image](https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/2f8c192c-4237-42c0-9d19-a63b0ff98a7e)
 
 This can now be used to create the equation of the state-space representation:
 
