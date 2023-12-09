@@ -9,7 +9,7 @@ import os
 #float type default
 tf.keras.backend.set_floatx('float64')
 
-path = "D:/Benutzer/alerch/sciebo/Labor_Forschung/PROJ_RMA_RheinMetall/Ergebnisse_Predator/"
+path = "C:/Your_folder/"
 
 #hyperparameters
 gamma = 0.5            #discount factor
