@@ -361,5 +361,9 @@ To hopefully get a well performing RL-agent, we have to think about the input $\
 | Output dimension  | 2 | 1 |
 | Activations function output  | TanH ($\mu$) \\ SoftPlus ($\sigma$) | Linear |
 
+In the following figure you can see the reward, critic and actor loss for each episode. With a change of the target profile you can also see changes in the reward curve. The curve looks stepped. At the same time there are no abrupt changes in the actor and critic loss.
+
+<img width="372" alt="image" src="https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/a2581bce-ea80-4589-b901-d7e9e6d94121">
+
 
 
