@@ -31,19 +31,25 @@ class dcmotor:
         self.model_dlti = self.create_dlti()
 
     def create_dlti(self):
-        R, L, Kn, Km, J = 0.365, 0.000161, 1.3, 0.123, 0.02
-        A = np.array([[-R/L, -1.0/(2.0*3.14*Kn*L)], [Km/J, 0.0]])
-        B = np.array([[1.0/L], [0.0]])
-        C = np.array([0.0, 1.0])
-        D = np.array([0.0])
+        R, L, K_M, b, J = 1.93, 0.0062, 0.05247, 0.00000597, 0.00000676  # DC motor parameters
+        K_E = K_M
+
+        # state space matrices of DC motor
+        A = np.array([[-(R / L), -(K_E / L)], [(K_M / J), -(b / J)]])
+        B = np.array([[(1 / L), 0], [0, -(1 / J)]])
+        C = np.array([0, 1])
+        D = np.array([0, 0])
+
         return signal.cont2discrete((A, B, C, D), delta_T)
 
     def next_state(self, omega, action):
-        #create input vector with action
-        U = []
-        for f in range(sample_steps):
-            U.append(action)
-        t_out, y_out, x_out = signal.dlsim(self.model_dlti, U, None, omega)
+        # create input vector with action
+        U = np.empty(shape=(sample_steps, 2), dtype=float)
+        for k in range(sample_steps):
+            U[k] = np.array([action[0], 0.0])
+
+        t_out, y_out, x_out = signal.dlsim(self.model_dlti, U, t=None, x0=np.array([0, omega]))
+
         return y_out[1]         #return next omega
 ```
 By calling this class, the DC-motor gets initialised as a DLTI-system.
