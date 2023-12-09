@@ -342,7 +342,24 @@ The next step is to choose a right reducing factor $\gamma$. Instead of examinin
 | 0.99  | -10.88  |
 
 ## Training
+To hopefully get a well performing RL-agent, we have to think about the input $\omega_{target}$. E.g. the input values are increased gradually or changing between low and values for a certain time. The intention is that the RL-agent has the possibility to learn an appropriate policy for a fast increasing/decreasing target angular velocity and to stay at a certain angular velocity. The RL-agent got trained over 2,000 episodes. After each 250th episode there is a change of the target profile. In the two tables you can see the choosen hyperparameters and the topology of the two neural networks
+| Hyperparameter  | Number / Value  |
+|---|---|
+| Episodes  | 2,000  |
+| Steps per episode | 240  |
+| Reducing factor  | 0.5  |
+| Learning rate actor  | 0.00006  |
+| Learning rate critic  | 0.00025  |
+| Factor reward function  | -0.95  |
 
+| Neural network parameter  | Actor | Critic |
+|---|---|---|
+| Input dimension  | 2 | 2 |
+| Hidden layers | 2 | 2 |
+| Neurons per hidden layer  | 100 | 100 |
+| Activation function hidden layer  | ReLU | ReLU |
+| Output dimension  | 2 | 1 |
+| Activations function output  | TanH ($\mu$) \\ SoftPlus ($\sigma$) | Linear |
 
 
 
