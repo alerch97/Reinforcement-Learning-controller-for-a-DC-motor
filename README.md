@@ -21,7 +21,8 @@ I decided to create a state-space representation of the DC-motor. There is the p
 
 This can now be used to create the equation of the state-space representation:
 
-![image](https://github.com/alerch97/Reinforcement-Learning-for-a-DC-motor/assets/152506794/030f460c-ab88-4425-83af-747fa4a6e0e2)
+![StateSpace_DCMotor](https://github.com/alerch97/Reinforcement-Learning-controller-for-a-DC-motor/assets/152506794/a092876d-c567-4693-b272-acff0969a5bc)
+
 
 The states taken into consideration and actions made by the RL-agent are valid for a specific moment. Therefore the state-space model will be time-discretized with a fixed time step of 0.05 s. In combination with the selected motor parameters you cannot see discontinuities in step responses (here not included). To implement these considerations we create a class for the DC-motor:
 ```python
