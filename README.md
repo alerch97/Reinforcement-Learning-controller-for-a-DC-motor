@@ -26,7 +26,7 @@ This can now be used to create the equation of the state-space representation:
 
 The states taken into consideration and actions made by the RL-agent are valid for a specific moment. Therefore the state-space model will be time-discretized with a fixed time step of 0.05 s. In combination with the selected motor parameters you cannot see discontinuities in step responses (here not included). To implement these considerations we create a class for the DC-motor:
 ```python
-class dcmotor:
+class Dcmotor:
     def __init__(self):
         self.model_dlti = self.create_dlti()
 
@@ -94,29 +94,29 @@ max_episodes = 2000    #number of episodes
 delta_T = 0.05          #for DLTI
 c = -0.95               #factor reward function
 
-class actor:...
+class Actor:...
 
-class critic:...
+class Critic:...
 
-class dcmotor:...
+class Dcmotor:...
 
-class agent:...
+class Agent:...
 
-agent().train()
+Agent().train()
 ```
 ## Agent
 By calling the agent class, the actor critic and DC-motor get initialised. The dimensions of the state and action vectors are set. The action bound is fixed to 50 volts. For the random selection of an action the standard deviation is also bounded. The train function starts with initialising empty lists. For the start of an episode the motor start with an angular velocity of $\omega=0$. With the if else query during an episode, a continouse change of the target angular velocity is performed (can be better realised maybe with methods of Desing of Experiments (DoE)). Based on the current state, the recommended action of the actor is calculated and gets fed to the motor for determining the next state. With the new reward the values of TD-target and the advantage function are calculated. If $k$ reaches the maximum step count of 240, an update of the actor's and critic's neural networks is performed. After finishing the training process, different plots are displayed (losses and reward).
 ```python
-class agent:
+class Agent:
     def __init__(self):
         self.state_dim = 2
         self.action_dim = 1
         self.action_bound = 50.0
         self.std_bound = [1e-5, 1.0]
 
-        self.actor = actor(self.state_dim, self.action_dim, self.action_bound, self.std_bound)
-        self.critic = critic(self.state_dim)
-        self.dcmotor = dcmotor()
+        self.actor = Actor(self.state_dim, self.action_dim, self.action_bound, self.std_bound)
+        self.critic = Critic(self.state_dim)
+        self.dcmotor = Dcmotor()
 
     def td_target(self, reward, next_state, k):
         if k==(sample_steps-1):
@@ -230,7 +230,8 @@ class agent:
 In the beginning, the actor's neural network with two hidden layers (each with 100 neurons) is initialised. The output of the actor is a gaussian distribution with a mean $\mu$ and a standard deviation $\sigma$. Initially, $\sigma$ is quite big, which leads to actions being further away from the mean to guarantee an exploration of the whole action range. The softplus activation function guarantees the range $[0,1]$ for $\sigma$. The selection of the tanh activation function for $\mu$ is examined later. By performing a prediction for the current state, we get next action (voltage) for the motor. To perform the training via gradient descent, we have to define a compatabile loss function based on the gaussian output. Due to the characteristics of the A2C-algorithm, the loss consists of the logarithmic probability density function times the value of the advantage function (provided by the critic).
 
 ```python
-def __init__(self, state_dim, action_dim, action_bound, std_bound):
+class Actor:
+    def __init__(self, state_dim, action_dim, action_bound, std_bound):
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.action_bound = action_bound
@@ -278,7 +279,7 @@ def __init__(self, state_dim, action_dim, action_bound, std_bound):
 In the beginning, the critic's neural network with two hidden layers (each with 100 neurons) is initialised. The output of the critic is a linear activation function because the value of the value function can be whatever negative or positive. The loss function is the mean squared error between the by the critic's neural network predicted value function and the TD-target. Here the neural networks gets updated regarding the best guess (TD-target).
 
 ```python
-class critic:
+class Critic:
     def __init__(self, state_dim):
         self.state_dim = state_dim
         self.model = self.create_model()
